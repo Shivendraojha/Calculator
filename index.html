@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>a simple calculator</title>
+    <style>
+        body {
+            background-color: black;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            background-image:
+                linear-gradient(to bottom, rgba(255, 0, 0, 0.5), rgba(0, 0, 225, 0.5)),
+                url('last3.jfif');
+            /* margin: 30px auto; */
+            padding-top: 35px;
+        }
+
+        .calculator {
+            width: 320px;
+            height: 520px;
+            background-color: rgb(218, 211, 211);
+            margin-left: 340px;
+            margin-top: 40px;
+            border-radius: 5px;
+            box-shadow: 0 5px 25px 2px black;
+        }
+
+        .result {
+            height: 120px;
+        }
+
+        .keyboard {
+            height: 420px;
+        }
+
+        #history {
+            text-align: right;
+            height: 20px;
+            margin: 0 20px;
+            padding-top: 20px;
+            font-size: 15px;
+            color: #919191;
+        }
+
+        #output {
+            text-align: right;
+            height: 60px;
+            margin: 10px 20px;
+            font-size: 30px;
+        }
+
+        .operator,
+        .number,
+        .empty {
+            width: 50px;
+            height: 50px;
+            margin: 15px;
+            float: left;
+            border-radius: 50%;
+            border-width: 0px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .number,
+        .empty {
+            background-color: rgb(218, 211, 211);
+        }
+
+        .number,
+        .operator {
+            cursor: pointer;
+        }
+
+        .operator:active,
+        .number:active {
+            font-size: 13px;
+        }
+
+        .operator:focus,
+        .number:focus,
+        .empty:focus {
+            outline: 0px;
+        }
+
+        button:nth-child(4) {
+            font-size: 20px;
+            background-color: rgb(60, 40, 175);
+        }
+
+        button:nth-child(8) {
+            font-size: 20px;
+            background-color: rgb(175, 132, 40);
+        }
+
+        button:nth-child(12) {
+            font-size: 20px;
+            background-color: rgb(40, 175, 51);
+        }
+
+        button:nth-child(16) {
+            font-size: 20px;
+            background-color: rgb(175, 40, 74);
+        }
+
+        button:nth-child(20) {
+            font-size: 20px;
+            background-color: rgb(48, 205, 233);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="calculator">
+            <div class="result">
+                <div id="history">
+                    <p id="history-value"></p>
+                </div>
+                <div id="output">
+                    <p id="output-value"></p>
+                </div>
+
+            </div>
+            <div class="keyboard">
+                <button class="operator" id="clear">C</button>
+                <button class="operator" id="backspace">CE</button>
+                <button class="operator" id="%">%</button>
+                <button class="operator" id="/">&#247;</button>
+                <button class="number" id="7">7</button>
+                <button class="number" id="8">8</button>
+                <button class="number" id="9">9</button>
+                <button class="operator" id="*">&times;</button>
+                <button class="number" id="4">4</button>
+                <button class="number" id="5">5</button>
+                <button class="number" id="6">6</button>
+                <button class="operator" id="-">-</button>
+                <button class="number" id="1">1</button>
+                <button class="number" id="2">2</button>
+                <button class="number" id="3">3</button>
+                <button class="operator" id="+">+</button>
+                <button class="empty" id="empty"></button>
+                <button class="number" id="0">0</button>
+                <button class="empty" id="empty"></button>
+                <button class="operator" id="=">=</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function getHistory() {
+            return document.getElementById("history-value").innerText;
+        }
+        function printHistory(num) {
+            document.getElementById("history-value").innerText = num;
+        }
+        function getOutput() {
+            return document.getElementById("output-value").innerText;
+        }
+        function printOutput(num) {
+            if (num == "") {
+                document.getElementById("output-value").innerText = num;
+            }
+            else {
+                document.getElementById("output-value").innerText = getFormattedNumber(num);
+            }
+        }
+        function getFormattedNumber(num) {
+            if (num == "-") {
+                return "";
+            }
+            var n = Number(num);
+            var value = n.toLocaleString("en");
+            return value;
+        }
+        function reverseNumberFormat(num) {
+            return Number(num.replace(/,/g, ''));
+        }
+        var operator = document.getElementsByClassName("operator");
+        for (var i = 0; i < operator.length; i++) {
+            operator[i].addEventListener('click', function () {
+                if (this.id == "clear") {
+                    printHistory("");
+                    printOutput("");
+                }
+                else if (this.id == "backspace") {
+                    var output = reverseNumberFormat(getOutput()).toString();
+                    if (output) {//if output has a value
+                        output = output.substr(0, output.length - 1);
+                        printOutput(output);
+                    }
+                }
+                else {
+                    var output = getOutput();
+                    var history = getHistory();
+                    if (output == "" && history != "") {
+                        if (isNaN(history[history.length - 1])) {
+                            history = history.substr(0, history.length - 1);
+                        }
+                    }
+                    if (output != "" || history != "") {
+                        output = output == "" ? output : reverseNumberFormat(output);
+                        history = history + output;
+                        if (this.id == "=") {
+                            var result = eval(history);
+                            printOutput(result);
+                            printHistory("");
+                        }
+                        else {
+                            history = history + this.id;
+                            printHistory(history);
+                            printOutput("");
+                        }
+                    }
+                }
+
+            });
+        }
+        var number = document.getElementsByClassName("number");
+        for (var i = 0; i < number.length; i++) {
+            number[i].addEventListener('click', function () {
+                var output = reverseNumberFormat(getOutput());
+                if (output != NaN) { //if output is a number
+                    output = output + this.id;
+                    printOutput(output);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
